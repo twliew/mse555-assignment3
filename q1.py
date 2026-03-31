@@ -383,15 +383,15 @@ def call_llm(prompt: str) -> str:
     # return resp.content[0].text.strip()
 
     # ── Option C: Google Gemini ──────────────────────────────────────────────
-    # import os
-    # from google import genai
-    #
-    # client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    # resp = client.models.generate_content(
-    #     model="gemini-2.5-pro",
-    #     contents=prompt,
-    # )
-    # return resp.text.strip()
+    import os
+    from google import genai
+    
+    client = genai.Client(api_key="AIzaSyAOYY19UVJwsfM3Q7LeZRI5TOBJFC4SVxc")
+    resp = client.models.generate_content(
+        model="gemini-2.5-pro",
+        contents=prompt,
+    )
+    return resp.text.strip()
 
     # TODO ── uncomment one option above, then delete this line ─────────────
     raise NotImplementedError("Implement call_llm() by uncommenting one option above")

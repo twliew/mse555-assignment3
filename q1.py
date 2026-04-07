@@ -420,8 +420,7 @@ def call_llm(prompt: str) -> str:
     return resp.text.strip()
 
     # TODO ── uncomment one option above, then delete this line ─────────────
-    raise NotImplementedError("Implement call_llm() by uncommenting one option above")
-
+    
 
 # ============================================================================
 # CLIENT-LEVEL SCORING
@@ -776,7 +775,7 @@ def run_unlabeled_pipeline(config: Q1BUnlabeledConfig) -> List[Dict[str, Any]]:
 #   print(call_llm(build_prompt(notes_str))) # check the raw model response
 # ============================================================================
 
-if __name__ == "__main__":
+def main() -> None:
     LABELED_CONFIG = Q1ALabeledConfig(
         test_path="labeled_notes.json",
         evaluated_output_path="output/q1/evaluated_labeled_results.json",
@@ -791,3 +790,7 @@ if __name__ == "__main__":
 
     # Step 4: score all unlabeled clients (only after prompt is validated)
     # run_unlabeled_pipeline(UNLABELED_CONFIG)
+
+
+if __name__ == "__main__":
+    main()

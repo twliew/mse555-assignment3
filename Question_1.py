@@ -49,6 +49,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List
+import time
 
 from tqdm import tqdm
 
@@ -385,16 +386,16 @@ def call_llm(prompt: str) -> str:
       validation happen in parse_vector_from_response().
     """
     # ── Option A: OpenAI ────────────────────────────────────────────────────
-    # import os
-    # from openai import OpenAI
-    #
-    # client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    # resp = client.chat.completions.create(
-    #     model="gpt-4o",
-    #     messages=[{"role": "user", "content": prompt}],
-    #     temperature=0.0,
-    # )
-    # return (resp.choices[0].message.content or "").strip()
+    import os
+    from openai import OpenAI
+    
+    client = OpenAI(api_key="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")
+    resp = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.0,
+    )
+    return (resp.choices[0].message.content or "").strip()
 
     # ── Option B: Anthropic (Claude) ────────────────────────────────────────
     # import os
@@ -409,18 +410,18 @@ def call_llm(prompt: str) -> str:
     # return resp.content[0].text.strip()
 
     # ── Option C: Google Gemini ──────────────────────────────────────────────
-    import os
-    from google import genai
+    # import os
+    # from google import genai
     
-    client = genai.Client(api_key="AIzaSyAOYY19UVJwsfM3Q7LeZRI5TOBJFC4SVxc")
-    resp = client.models.generate_content(
-        model="gemini-2.5-pro",
-        contents=prompt,
-    )
-    return resp.text.strip()
+    # client = genai.Client(api_key="AIzaSyAyX35T577mFxGQ9KQe9oJ_mD_ZsSU5nmQ")
+    # resp = client.models.generate_content(
+    #     model="gemini-2.0-flash",
+    #     contents=prompt,
+    # )
+    # return resp.text.strip()
 
-    # TODO ── uncomment one option above, then delete this line ─────────────
-    raise NotImplementedError("Implement call_llm() by uncommenting one option above")
+    # # TODO ── uncomment one option above, then delete this line ─────────────
+    # raise NotImplementedError("Implement call_llm() by uncommenting one option above")
 
 
 # ============================================================================
@@ -553,6 +554,9 @@ def score_dataset(
     for client_record in tqdm(data, desc=progress_desc):
         scored_record = score_client_record(client_record, config)
         scored.append(scored_record)
+
+        # --- ADD THIS LINE ---
+        time.sleep(12)
 
     return scored
 

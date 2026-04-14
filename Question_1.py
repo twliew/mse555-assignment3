@@ -322,122 +322,146 @@ def build_prompt(notes_json_str: str) -> str:
 
 Clinical Background
 
-In pediatric speech-language therapy, progress is typically evaluated along two main dimensions.
+In pediatric speech-language therapy, progress is evaluated along two dimensions.
 
-The first is goal level, which moves from simpler to more complex skills:
-- Sound production (isolation)  
-- Syllable production  
-- Single word production  
-- Carrier phrase production  
-- Sentence production  
-- Spontaneous speech or conversation  
+Goal level (from simpler to more complex skills):
+- Sound production (isolation)
+- Syllable production
+- Single word production
+- Carrier phrase production
+- Sentence production
+- Spontaneous speech or conversation
 
-The second is level of independence within a goal:
-- By imitation (the clinician models first)  
-- With cueing (verbal, visual, or tactile prompts are provided)  
-- Independently (no prompts needed)  
+Level of independence within a goal:
+- By imitation (the clinician models first)
+- With cueing (verbal, visual, or tactile prompts)
+- Independently (no prompts needed)
 
-Progress can show up in different ways. A child may move to a higher goal level, require less cueing within the same level, or demonstrate more consistent and generalized performance across activities.
+Progress may be demonstrated by movement to a higher goal level, reduced cueing within the same level, or more consistent and generalized performance across activities or contexts.
+
+Scoring Task
+
+You will be given an ordered sequence of session notes for ONE client.
+
+Your task is to evaluate RELATIVE progress BETWEEN SESSIONS.
+
+IMPORTANT TEMPORAL RULES:
+- Compare each session ONLY to the immediately preceding session.
+- Do NOT use information from earlier sessions when assigning a score.
+- Do NOT judge absolute skill level; judge change from Session N to Session N+1 only.
+- Do NOT infer progress unless it is explicitly or clearly implied in the notes.
+
+For each consecutive pair of session notes (Session N → Session N+1), assign exactly one score from 0 to 3.
 
 Scoring Scale
 
-For each consecutive pair of session notes (Session N to Session N+1), assign exactly one score from 0 to 3.
+Score 0 — Maintenance or Minimal Change  
+The child is functioning at essentially the same level as before. Accuracy, cueing, independence, and goal level are similar, with no clear improvement.
 
-Score 0: Maintenance or Minimal Change  
-The child is functioning at essentially the same level as before. Accuracy, cueing, and goal level are similar, and there is no clear improvement.  
-Typical language includes: “similar to last week,” “continued practice,” “ongoing work,” or “same level of support.”
+Typical language includes:
+“similar to last week,” “continued practice,” “ongoing work,” “same level of support.”
 
-Important clarification:  
-The following are still Score 0, not Score 1:
-- Parent reports the child is trying more at home, but no change is seen in session  
-- Good engagement or participation without improvement in accuracy or cueing  
-- Continued work at the same level with similar support  
-- “Some improvement” that remains inconsistent  
+Important clarification — the following are STILL Score 0:
+- Parent reports increased effort at home without in-session change
+- Good engagement or participation without better accuracy or independence
+- Continued work at the same level with similar support
+- Vague or anecdotal “some improvement” that remains inconsistent
 
-Score 1: Small but Clear Improvement  
-There is modest progress within the same general level. There must be at least one specific and concrete improvement in accuracy or cueing. This cannot be based only on positive wording or parent report.  
+Score 1 — Small but Clear Improvement  
+There is modest but observable progress within the same general level. At least one concrete improvement must be documented.
+
 Examples include:
-- Accuracy improving (for example, from around 40% to 60%)  
-- Moving from maximal to moderate cueing  
-- Early generalization to a new context  
+- Accuracy improves (e.g., ~40% to ~60%)
+- Cueing decreases (e.g., maximal to moderate)
+- Early generalization to a new task or context
 
-Score 2: Meaningful Clinical Progress  
-There is a clear and clinically meaningful step forward. This may include stronger consistency, noticeably reduced cueing, or generalization across multiple tasks or contexts.  
-Typical signs include:
-- Consistent performance rather than variable  
-- Minimal cueing needed  
-- Skills carrying over across activities  
+Score 2 — Meaningful Clinical Progress  
+There is a clear, clinically meaningful shift that would matter for treatment or discharge decisions.
 
-Score 3: Major Gain or Step Up in Level  
-This represents a clear breakthrough. The child moves to a higher goal level, demonstrates independence, or shows spontaneous use of a skill for the first time. This score should be used sparingly.  
+Indicators include:
+- Consistent performance replacing variability
+- Clearly reduced support or cueing
+- Skills generalizing across multiple activities, settings, or targets
+
+Score 3 — Major Gain or Step Up in Level  
+This score should be used sparingly. Assign only when a clear breakthrough is evident.
+
 Examples include:
-- Moving from word level to phrase or sentence level  
-- Producing targets independently without prompting  
-- First clear evidence of spontaneous use  
+- Movement to a higher goal level (e.g., word → phrase, phrase → sentence)
+- Independent production without prompting
+- First clear evidence of spontaneous use
 
 Boundary Guidance
 
-Score 0 vs 1:  
-If you cannot point to a specific, observable improvement, assign Score 0. If there is even one clear and concrete improvement, assign Score 1.
+Score 0 vs 1:
+If no specific, observable improvement can be identified, assign Score 0.
+If even one clear and concrete improvement is present, assign Score 1.
 
-Score 1 vs 2:  
-Score 2 requires a noticeable and meaningful shift, such as clear consistency or a reduction in support. Score 1 reflects smaller, incremental progress.
+Score 1 vs 2:
+Score 2 requires a noticeable clinical shift (consistency, independence, or generalization).
+Incremental or partial gains remain Score 1.
 
-Score 2 vs 3:  
-Score 3 should only be used for true level jumps or clear independence. Strong improvement within the same level should be scored as 2.
+Score 2 vs 3:
+Score 3 is reserved for true level jumps or clear independence.
+Strong improvement within the same level is Score 2.
 
-Do not increase the score based only on improved behavior or engagement unless it directly leads to better speech performance.
+Do NOT increase scores based solely on improved attention, motivation, or engagement unless this directly results in improved speech or language performance.
 
 Worked Examples
 
-Score 3 example:  
-Session 1 shows /k/ only in isolation and syllables with maximal cueing.  
-Session 2 shows /k/ produced at the word level with minimal cueing and some spontaneous use.  
-This is a clear jump in both level and independence, so the score is 3.
+Score 3 example:
+Session 1: /k/ produced only in isolation and syllables with maximal cueing.
+Session 2: /k/ produced at the word level with minimal cueing and early spontaneous use.
+→ Clear jump in both level and independence → Score 3.
 
-Score 2 example:  
-Session 2 shows variable word-level performance with moderate support.  
-Session 3 shows better consistency, less cueing, and early phrase-level use.  
-This represents meaningful progress, so the score is 2.
+Score 2 example:
+Session 2: Variable word-level performance with moderate support.
+Session 3: Consistent accuracy, reduced cueing, and early phrase-level use.
+→ Meaningful clinical progress → Score 2.
 
-Score 1 example:  
-Session 3 shows solid phrase-level performance.  
-Session 4 maintains that level and introduces early sentence attempts, but accuracy drops.  
-This is a small step forward, so the score is 1.
+Score 1 example:
+Session 3: Solid phrase-level performance.
+Session 4: Early sentence attempts introduced, but accuracy drops.
+→ Small, concrete improvement → Score 1.
 
-Score 0 example:  
-Session 4 and Session 5 both show similar sentence-level performance, accuracy, and cueing.  
-There is no clear change, so the score is 0.
+Score 0 example:
+Session 4 and Session 5: Similar sentence-level performance, accuracy, and cueing.
+→ No observable change → Score 0.
 
-Score 0 example (positive tone but no real change):  
-Even if the session notes mention good effort, engagement, or attempts at home, if accuracy and cueing remain the same, the score is still 0.
+Positive tone alone does NOT imply progress:
+If notes emphasize effort, participation, or engagement without performance change, the correct score remains 0.
 
 Critical Rule
 
-Maintenance is the most common outcome in speech therapy. If you are unsure whether real progress has occurred, default to Score 0. Only assign Score 1 or higher when there is clear, observable evidence of improvement.
+Maintenance is common in speech-language therapy.
+If evidence of progress is ambiguous or weak, default to Score 0.
+Assign Scores 1–3 only when improvement is clearly observable in the notes.
 
-CALIBRATION CHECK:
-Across a full session sequence, you should expect a realistic mix of scores.
-- Score 0 is most common, but should NOT dominate every sequence
-- Score 1 should appear regularly when any concrete improvement is documented
-- Score 2 should appear when a meaningful clinical shift is evident
-- Score 3 is rare but must be assigned when a true level jump occurs — do not avoid it
-If your output contains no scores above 1, you are under-scoring.
+Calibration Check
+
+Across a realistic session sequence:
+- Score 0 should be common
+- Score 1 should appear when incremental gains are documented
+- Score 2 should reflect meaningful clinical shifts
+- Score 3 should be rare but must be assigned when clearly warranted
+
+Do not inflate scores to satisfy calibration if evidence does not support it.
 
 Your Task
 
-You will be given a sequence of session notes in JSON format. Each note includes a note_number and note_text.
+You will be given session notes in JSON format.
+Each note includes a note_number and note_text.
 
-For every consecutive pair of notes (note 1 to 2, note 2 to 3, and so on), assign one score from 0 to 3 based on the criteria above.
+For every consecutive pair (note 1 → 2, note 2 → 3, etc.), assign one progress score.
 
 SESSION NOTES:
 {notes_json_str}
 
-Return only a JSON list of integers with exactly one score per consecutive pair. Do not include any explanations or additional text.
+Return only a JSON list of integers with exactly one score per consecutive pair.
+Do not include explanations or additional text.
 
 Example:
 [3, 1, 0, 0, 1, 2, 0, 0, 0, 1, 0]'''
-
 
 # ============================================================================
 # TODO 2 of 3 — LLM CALL
@@ -851,6 +875,44 @@ def run_unlabeled_pipeline(config: Q1BUnlabeledConfig) -> List[Dict[str, Any]]:
 #   print(build_prompt(notes_str))           # inspect the prompt visually
 #   print(call_llm(build_prompt(notes_str))) # check the raw model response
 # ============================================================================
+import csv
+
+def save_scored_notes_csv(
+    scored_unlabeled_data: List[Dict[str, Any]],
+    output_csv_path: str,
+    client_id_key: str = "client_id",
+    pred_vector_key: str = "estimated_trajectory_vector",
+) -> None:
+    """
+    Save model-scored progress vectors into a flat CSV with columns:
+        client_id, session, score
+    """
+    output_path = ensure_parent_dir(output_csv_path)
+
+    rows = []
+    for record in scored_unlabeled_data:
+        client_id = record[client_id_key]
+        scores = record.get(pred_vector_key, [])
+
+        for idx, score in enumerate(scores, start=1):
+            rows.append(
+                {
+                    "client_id": client_id,
+                    "session": idx,
+                    "score": score,
+                }
+            )
+
+    with open(output_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f, fieldnames=["client_id", "session", "score"]
+        )
+        writer.writeheader()
+        writer.writerows(rows)
+
+    print(f"Saved CSV: {output_path}")
+
+
 
 if __name__ == "__main__":
     LABELED_CONFIG = Q1ALabeledConfig(
@@ -866,4 +928,14 @@ if __name__ == "__main__":
     run_test_pipeline(LABELED_CONFIG)
 
     # Step 4: score all unlabeled clients (only after prompt is validated)
-    # run_unlabeled_pipeline(UNLABELED_CONFIG)
+    run_unlabeled_pipeline(UNLABELED_CONFIG)
+    
+    scored_unlabeled_data = load_json("output/q1/scored_notes.json")
+    
+
+    save_scored_notes_csv(
+        scored_unlabeled_data=scored_unlabeled_data,
+        output_csv_path="output/q1/scored_notes.csv",
+        client_id_key=UNLABELED_CONFIG.client_id_key,
+        pred_vector_key=UNLABELED_CONFIG.pred_vector_key,
+    )

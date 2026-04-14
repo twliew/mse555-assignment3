@@ -1,0 +1,104 @@
+=== Optimal Reassessment Policy Details (K=5) ===
+
+Cluster 1 (n=13 clients):
+Optimal reassessment session: Q* = 8
+Stopping points: [3, 5, 5, 7, 7, 7, 8, 8, 9, 11, 11, 11, 11]
+Expected savings by Q:
+  Q=1: 0.00
+  Q=2: 0.00
+  Q=3: 0.69
+  Q=4: 0.62
+  Q=5: 1.62
+  Q=6: 1.38
+  Q=7: 2.31
+  Q=8: 2.46
+  Q=9: 2.08
+  Q=10: 1.38
+  Q=11: 1.00
+  Q=12: 0.00
+
+
+Cluster 2 (n=12 clients):
+Optimal reassessment session: Q* = 7
+Stopping points: [6, 6, 7, 7, 7, 7, 7, 7, 7, 8, 8, 9]
+Expected savings by Q:
+  Q=1: 0.00
+  Q=2: 0.00
+  Q=3: 0.00
+  Q=4: 0.00
+  Q=5: 0.00
+  Q=6: 1.00
+  Q=7: 3.75
+  Q=8: 3.67
+  Q=9: 3.00
+  Q=10: 2.00
+  Q=11: 1.00
+  Q=12: 0.00
+
+
+Cluster 3 (n=9 clients):
+Optimal reassessment session: Q* = 5
+Stopping points: [4, 4, 4, 4, 4, 5, 7, 9, 10]
+Expected savings by Q:
+  Q=1: 0.00
+  Q=2: 0.00
+  Q=3: 0.00
+  Q=4: 4.44
+  Q=5: 4.67
+  Q=6: 4.00
+  Q=7: 3.89
+  Q=8: 3.11
+  Q=9: 2.67
+  Q=10: 2.00
+  Q=11: 1.00
+  Q=12: 0.00
+
+
+Cluster 4 (n=28 clients):
+Optimal reassessment session: Q* = 8
+Stopping points: [5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 10, 10, 11, 11, 11]
+Expected savings by Q:
+  Q=1: 0.00
+  Q=2: 0.00
+  Q=3: 0.00
+  Q=4: 0.00
+  Q=5: 0.50
+  Q=6: 1.29
+  Q=7: 2.32
+  Q=8: 3.29
+  Q=9: 2.46
+  Q=10: 1.79
+  Q=11: 1.00
+  Q=12: 0.00
+
+
+Cluster 5 (n=18 clients):
+Optimal reassessment session: Q* = 5
+Stopping points: [2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 7, 7, 7, 10, 11]
+Expected savings by Q:
+  Q=1: 0.00
+  Q=2: 0.56
+  Q=3: 3.00
+  Q=4: 4.89
+  Q=5: 5.06
+  Q=6: 4.33
+  Q=7: 4.44
+  Q=8: 3.56
+  Q=9: 2.67
+  Q=10: 1.89
+  Q=11: 1.00
+  Q=12: 0.00
+
+
+=== K Selection Analysis ===
+
+Selected K = 5 based on:
+- Maximum number of distinct reassessment policies
+- Good clustering quality (silhouette score)
+- Actionable policy recommendations
+
+Comparison of K values:
+K=3: 2 unique policies, silhouette=0.257, avg savings=3.62
+K=4: 2 unique policies, silhouette=0.262, avg savings=3.98
+K=5: 3 unique policies, silhouette=0.268, avg savings=3.84
+K=6: 3 unique policies, silhouette=0.258, avg savings=3.79

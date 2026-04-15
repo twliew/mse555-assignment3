@@ -8,10 +8,12 @@ from sklearn.metrics import silhouette_score
 import warnings
 warnings.filterwarnings('ignore')
 
-# Set up plotting style
 plt.style.use('seaborn-v0_8')
 sns.set_palette("husl")
 
+# Part A: Build the clustering model and apply K-means for the cumulative session trajectories
+# This section loads scored session data, constructs client trajectories, and clusters clients
+# by their cumulative progress patterns.
 def load_and_prepare_data():
     """Load scored notes and prepare cumulative trajectories"""
     # Load the scored data
@@ -20,10 +22,10 @@ def load_and_prepare_data():
     # Pivot to get trajectories: rows = clients, columns = sessions
     trajectories = df.pivot(index='client_id', columns='session', values='score')
 
-    # Fill any missing sessions with 0 (though data seems complete)
+    # Fill any missing sessions with 0 
     trajectories = trajectories.fillna(0)
 
-    # Create cumulative trajectories (cumulative sum across sessions)
+    # Create cumulative trajectories 
     cumulative_trajectories = trajectories.cumsum(axis=1)
 
     return trajectories, cumulative_trajectories
@@ -172,6 +174,9 @@ def compute_empirical_cdf(values, max_q):
 
     return cdf
 
+# Part B: Derive the optimal reassessment policy from the cluster-specific progress distributions
+# This section computes each client's stopping point and evaluates the expected sessions saved
+# for each potential reassessment session Q.
 def find_optimal_reassessment_policy(cumulative_trajectories, clusters, n_clusters=4, T_max=12):
     """Find optimal reassessment policy for each cluster using newsvendor-style audit model"""
 
@@ -224,6 +229,9 @@ def find_optimal_reassessment_policy(cumulative_trajectories, clusters, n_cluste
 
     return policy_results, stopping_points
 
+# Part C: Select K using policy outcomes and clustering quality
+# This section evaluates candidate K values, compares silhouette scores and unique policies,
+# and chooses the most actionable clustering solution.
 def evaluate_k_values(cumulative_trajectories, k_values=[3, 4, 5, 6]):
     """Evaluate different K values and their resulting policies"""
     print("\n=== Evaluating Different K Values ===")
@@ -289,6 +297,8 @@ def select_optimal_k(k_results):
 
     return best_k, k_results
 
+# Part D: Required plots for the final chosen K
+# This section generates the three required visualizations for the selected clustering policy.
 def create_stopping_point_histograms(cumulative_trajectories, clusters, stopping_points, n_clusters=5):
     """Create Plot 1: t* distributions - histograms of stopping points for each cluster"""
     fig, axes = plt.subplots(1, n_clusters, figsize=(15, 4), sharex=True, sharey=True)
@@ -442,6 +452,8 @@ def create_optimized_vs_baseline_comparison(policy_results, stopping_points, clu
 
     return fig, overall_improvement, improvement_per_client
 
+# Part E: Generate the summary table for the final K and recommended policy
+# This section summarizes each cluster's size, optimal reassessment session, and expected savings.
 def generate_summary_table(policy_results, n_clusters=5, T_max=12):
     """Generate and save a summary table for the final K choice."""
     rows = []
@@ -585,7 +597,9 @@ def main():
         policy_results, stopping_points, clusters, cumulative_trajectories, optimal_k
     )
 
-    # Generate and save the summary table
+    # Part F: Implications for the case and final interpretation
+    # This section prints the final outcome and highlights how the cluster-specific policy
+    # supports targeted reassessment decisions.
     print("Creating summary table...")
     generate_summary_table(policy_results, optimal_k)
 

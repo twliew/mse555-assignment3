@@ -11,36 +11,27 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 sns.set_style('whitegrid')
 sns.set_palette('husl')
 
-# Part A: Compare client intake characteristics across the trajectory clusters identified in Question 2.
-# This script loads intake features, joins them with cluster labels, and produces summary tables and plots.
-
+# Part A: Compare client intake characteristics across the trajectory clusters identified in Question 2
 def load_intake_and_clusters():
-    """Load intake characteristics and cluster labels from Q2."""
-    # Read intake feature data and previously computed cluster assignments
     features = pd.read_csv('client_features.csv')
     cluster_labels = pd.read_csv('output/q2/cluster_assignments.csv')
 
-    # Merge on client_id so each client has intake features plus cluster membership
     merged = features.merge(cluster_labels[['client_id', 'cluster']], on='client_id', how='inner')
     merged['cluster'] = merged['cluster'].astype(int)
     return merged
 
 
 def build_summary_tables(data):
-    """Build numeric and categorical summaries by cluster."""
     numeric_features = ['age_years', 'complexity_score']
     categorical_features = ['gender', 'referral_reason']
 
-    # Compute common numeric summary statistics for each cluster
     numeric_summary = data.groupby('cluster')[numeric_features].agg(['count', 'mean', 'std', 'min', 'max'])
 
-    # Add cluster-level quartiles for each numeric feature
     quantiles = data.groupby('cluster')[numeric_features].quantile([0.25, 0.5, 0.75]).unstack(level=-1)
     quantiles.columns = [f'{feature}_{int(q*100)}%' for feature, q in quantiles.columns]
     numeric_summary = pd.concat([numeric_summary, quantiles], axis=1)
     numeric_summary = numeric_summary.rename(columns={f'{feature}_50%': f'{feature}_median' for feature in numeric_features})
 
-    # Build normalized categorical distributions by cluster
     categorical_summary = {
         feature: pd.crosstab(data['cluster'], data[feature], normalize='index')
         for feature in categorical_features
@@ -50,17 +41,14 @@ def build_summary_tables(data):
 
 
 def plot_numeric_features(data, out_dir):
-    """Create boxplots for numeric intake features across clusters."""
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
-    # Plot age distributions by cluster with overlaid points
     sns.boxplot(x='cluster', y='age_years', data=data, palette='husl', ax=axes[0])
     sns.stripplot(x='cluster', y='age_years', data=data, color='black', alpha=0.5, size=4, ax=axes[0])
     axes[0].set_title('Age at Intake by Trajectory Cluster')
     axes[0].set_xlabel('Trajectory Cluster')
     axes[0].set_ylabel('Age (years)')
 
-    # Plot complexity score distributions by cluster
     sns.boxplot(x='cluster', y='complexity_score', data=data, palette='husl', ax=axes[1])
     sns.stripplot(x='cluster', y='complexity_score', data=data, color='black', alpha=0.5, size=4, ax=axes[1])
     axes[1].set_title('Complexity Score by Trajectory Cluster')
@@ -75,7 +63,6 @@ def plot_numeric_features(data, out_dir):
 
 
 def plot_categorical_features(data, out_dir):
-    """Create stacked bar charts for categorical intake features by cluster."""
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))
 
     gender_prop = pd.crosstab(data['cluster'], data['gender'], normalize='index')
@@ -100,7 +87,6 @@ def plot_categorical_features(data, out_dir):
 
 
 def plot_feature_grid(data, out_dir):
-    """Create a combined plot grid for intake features by cluster."""
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
 
     sns.countplot(x='cluster', hue='gender', data=data, palette='Set2', ax=axes[0, 0])
@@ -131,10 +117,8 @@ def plot_feature_grid(data, out_dir):
 
 
 def compute_feature_separation(data):
-    """Estimate which intake features are most distinct across clusters."""
     results = {}
 
-    # Numeric features: calculate eta-squared to quantify how much cluster means explain variance
     for feature in ['age_years', 'complexity_score']:
         overall_mean = data[feature].mean()
         ss_total = ((data[feature] - overall_mean) ** 2).sum()
@@ -145,7 +129,6 @@ def compute_feature_separation(data):
         eta2 = ss_between / ss_total if ss_total > 0 else 0.0
         results[feature] = {'type': 'numeric', 'eta2': eta2}
 
-    # Categorical features: measure how much each cluster's proportions differ from the overall distribution
     for feature in ['gender', 'referral_reason']:
         overall_prop = data[feature].value_counts(normalize=True)
         cluster_props = pd.crosstab(data['cluster'], data[feature], normalize='index')
@@ -156,7 +139,6 @@ def compute_feature_separation(data):
 
 
 def print_feature_insights(data, separation_scores):
-    """Print interpretive insights about which features distinguish clusters."""
     print('\n=== Intake Feature Comparison Across Trajectory Clusters ===\n')
     print(f'Total clients included: {len(data)}')
     print(f'Clusters found: {sorted(data["cluster"].unique())}\n')
@@ -181,9 +163,8 @@ def print_feature_insights(data, separation_scores):
 
 
 
-# part B: Train parametric and non-parametric classifiers to predict trajectory cluster membership from intake features, and report accuracy/confusion matrices.
+# Part B: Train parametric and non-parametric classifiers
 def prepare_model_data(data):
-    """Prepare intake feature matrix and cluster labels for classification."""
     features = ['age_years', 'complexity_score', 'gender', 'referral_reason']
     X = pd.get_dummies(data[features], drop_first=True)
     y = data['cluster']
@@ -191,8 +172,6 @@ def prepare_model_data(data):
 
 
 def train_and_evaluate_models(data, out_dir):
-    """Train parametric and non-parametric classifiers and report accuracy/confusion matrices."""
-    # Part B: Train classifiers on historical clients to predict trajectory cluster membership
     X, y = prepare_model_data(data)
 
     X_train, X_test, y_train, y_test = train_test_split(
@@ -256,21 +235,17 @@ def train_and_evaluate_models(data, out_dir):
 
 # Part C: Apply best model to waitlist and estimate capacity under differentiated reassessment policy
 def load_waitlist_data():
-    """Load intake characteristics for the current waitlist."""
     waitlist = pd.read_csv('waitlist.csv')
     return waitlist
 
 
 def apply_best_model_to_waitlist(best_model, model_columns, out_dir):
-    """Apply the trained best model to predict cluster membership for all waitlist clients."""
     waitlist = load_waitlist_data()
     features = ['age_years', 'complexity_score', 'gender', 'referral_reason']
     
-    # One-hot encode waitlist features and align with training columns
     X_waitlist = pd.get_dummies(waitlist[features], drop_first=True)
     X_waitlist = X_waitlist.reindex(columns=model_columns, fill_value=0)
     
-    # Predict cluster membership
     waitlist['predicted_cluster'] = best_model.predict(X_waitlist)
     waitlist.to_csv(os.path.join(out_dir, 'waitlist_predicted_clusters.csv'), index=False)
     
@@ -278,19 +253,15 @@ def apply_best_model_to_waitlist(best_model, model_columns, out_dir):
 
 
 def load_cluster_statistics():
-    """Load cluster Q* and estimated expected sessions from Q2 policy outputs."""
-    # Load Q* values for each cluster
     q_star_data = pd.read_csv('output/q2/reassessment_policy.csv', usecols=['cluster', 'optimal_q'])
     q_star_data['cluster'] = q_star_data['cluster'].astype(int)
     
-    # Map cluster-level expected delivered sessions based on Q2 analysis
-    # These are estimated from historical stopping points in each cluster
     expected_delivered = {
-        1: 7.85,  # Cluster 1: mean stopping point ≈ 7.85 sessions
-        2: 7.25,  # Cluster 2: mean stopping point ≈ 7.25 sessions
-        3: 5.67,  # Cluster 3: mean stopping point ≈ 5.67 sessions
-        4: 7.79,  # Cluster 4: mean stopping point ≈ 7.79 sessions
-        5: 5.0    # Cluster 5: mean stopping point ≈ 5.0 sessions
+        1: 7.85,
+        2: 7.25,
+        3: 5.67,
+        4: 7.79, 
+        5: 5.0 
     }
     
     q_star_data['expected_delivered_sessions'] = q_star_data['cluster'].map(expected_delivered)
@@ -298,8 +269,6 @@ def load_cluster_statistics():
 
 
 def estimate_waitlist_capacity(waitlist, q_star_data, tmax_baseline=12, out_dir=None):
-    """Estimate total session capacity needed for waitlist under differentiated policy vs. baseline."""
-    # Merge predicted clusters with Q* and expected sessions
     waitlist_merged = waitlist.merge(
         q_star_data, 
         left_on='predicted_cluster', 
@@ -307,12 +276,10 @@ def estimate_waitlist_capacity(waitlist, q_star_data, tmax_baseline=12, out_dir=
         how='left'
     )
     
-    # Calculate sessions under each scenario
     waitlist_merged['baseline_sessions'] = tmax_baseline
     waitlist_merged['policy_sessions'] = waitlist_merged['expected_delivered_sessions']
     waitlist_merged['session_savings'] = waitlist_merged['baseline_sessions'] - waitlist_merged['policy_sessions']
     
-    # Aggregate by predicted cluster
     cluster_summary = waitlist_merged.groupby('predicted_cluster').agg({
         'client_id': 'count',
         'optimal_q': 'first',
@@ -335,7 +302,6 @@ def estimate_waitlist_capacity(waitlist, q_star_data, tmax_baseline=12, out_dir=
 
 
 def print_capacity_analysis(waitlist, cluster_summary, tmax_baseline=12, best_name=None):
-    """Print comprehensive capacity comparison and insights."""
     total_baseline = tmax_baseline * len(waitlist)
     total_policy = waitlist['policy_sessions'].sum()
     total_savings = total_baseline - total_policy
@@ -354,7 +320,6 @@ def print_capacity_analysis(waitlist, cluster_summary, tmax_baseline=12, best_na
     print(f'\n--- Capacity Impact by Predicted Cluster ---')
     print(cluster_summary.to_string(index=False))
     
-    # Identify drivers of savings
     if len(cluster_summary) > 0:
         max_savings_row = cluster_summary.loc[cluster_summary['session_savings'].idxmax()]
         
@@ -367,25 +332,20 @@ def print_capacity_analysis(waitlist, cluster_summary, tmax_baseline=12, best_na
 
 
 def main():
-    # Ensure the output folder for Question 3 exists
     out_dir = 'output/q3'
     os.makedirs(out_dir, exist_ok=True)
 
-    # Load merged intake and cluster data, then generate summary tables
     data = load_intake_and_clusters()
     numeric_summary, categorical_summary = build_summary_tables(data)
 
-    # Save summary tables for later review
     numeric_summary.to_csv(os.path.join(out_dir, 'intake_numeric_summary_by_cluster.csv'))
     for feature, summary in categorical_summary.items():
         summary.to_csv(os.path.join(out_dir, f'intake_{feature}_proportions_by_cluster.csv'))
 
-    # Create and save visual summaries for intake features
     plot_numeric_features(data, out_dir)
     plot_categorical_features(data, out_dir)
     plot_feature_grid(data, out_dir)
 
-    # Compute and print feature separation metrics and interpretation
     separation_scores = compute_feature_separation(data)
     print_feature_insights(data, separation_scores)
 
@@ -397,7 +357,6 @@ def main():
     rf_model = model_results['random_forest']['model']
     rf_name = 'random_forest'
 
-    # Part C: Apply Random Forest to waitlist and estimate capacity under differentiated policy
     waitlist = apply_best_model_to_waitlist(rf_model, model_columns, out_dir)
     q_star_data = load_cluster_statistics()
     waitlist_merged, cluster_summary = estimate_waitlist_capacity(waitlist, q_star_data, tmax_baseline=12, out_dir=out_dir)

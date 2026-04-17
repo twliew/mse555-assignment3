@@ -12,58 +12,37 @@ plt.style.use('seaborn-v0_8')
 sns.set_palette("husl")
 
 # Part A: Build the clustering model and apply K-means for the cumulative session trajectories
-# This section loads scored session data, constructs client trajectories, and clusters clients
-# by their cumulative progress patterns.
 def load_and_prepare_data():
-    """Load scored notes and prepare cumulative trajectories"""
     # Load the scored data
     df = pd.read_csv('output/q1/scored_notes.csv')
-
-    # Pivot to get trajectories: rows = clients, columns = sessions
     trajectories = df.pivot(index='client_id', columns='session', values='score')
-
-    # Fill any missing sessions with 0 
     trajectories = trajectories.fillna(0)
-
-    # Create cumulative trajectories 
     cumulative_trajectories = trajectories.cumsum(axis=1)
 
     return trajectories, cumulative_trajectories
 
 def apply_clustering(cumulative_trajectories, n_clusters=4):
-    """Apply K-means clustering to the cumulative trajectories"""
-    # Standardize the data for better clustering
     scaler = StandardScaler()
     scaled_data = scaler.fit_transform(cumulative_trajectories)
 
     # Apply K-means
     kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
     clusters = kmeans.fit_predict(scaled_data)
-
-    # Calculate silhouette score
     silhouette_avg = silhouette_score(scaled_data, clusters)
 
     return clusters, kmeans, scaler, silhouette_avg
 
 def create_spaghetti_plots(trajectories, cumulative_trajectories, clusters, n_clusters=4):
-    """Create spaghetti plots showing individual trajectories and cluster means"""
-
-    # Set up the plotting area
     fig, axes = plt.subplots(1, 2, figsize=(15, 6))
-
-    # Colors for clusters
     colors = sns.color_palette("husl", n_clusters)
 
     # Plot 1: Raw session scores
     for i in range(n_clusters):
         cluster_clients = trajectories.index[clusters == i]
         cluster_data = trajectories.loc[cluster_clients]
-
-        # Plot individual trajectories (spaghetti)
         for client in cluster_clients:
             axes[0].plot(range(1, 12), cluster_data.loc[client], color=colors[i], alpha=0.3, linewidth=1)
 
-        # Plot cluster mean
         mean_trajectory = cluster_data.mean()
         axes[0].plot(range(1, 12), mean_trajectory, color=colors[i], linewidth=3, label=f'Cluster {i+1} (n={len(cluster_clients)})')
 
@@ -78,12 +57,9 @@ def create_spaghetti_plots(trajectories, cumulative_trajectories, clusters, n_cl
     for i in range(n_clusters):
         cluster_clients = cumulative_trajectories.index[clusters == i]
         cluster_data = cumulative_trajectories.loc[cluster_clients]
-
-        # Plot individual trajectories (spaghetti)
         for client in cluster_clients:
             axes[1].plot(range(1, 12), cluster_data.loc[client], color=colors[i], alpha=0.3, linewidth=1)
 
-        # Plot cluster mean
         mean_trajectory = cluster_data.mean()
         axes[1].plot(range(1, 12), mean_trajectory, color=colors[i], linewidth=3, label=f'Cluster {i+1}')
 
@@ -101,7 +77,6 @@ def create_spaghetti_plots(trajectories, cumulative_trajectories, clusters, n_cl
     return fig
 
 def analyze_clusters(cumulative_trajectories, clusters, n_clusters=4):
-    """Analyze and summarize cluster characteristics"""
     print(f"\n=== Clustering Analysis (K={n_clusters}) ===")
 
     cluster_summary = []
@@ -110,16 +85,14 @@ def analyze_clusters(cumulative_trajectories, clusters, n_clusters=4):
         cluster_clients = cumulative_trajectories.index[clusters == i]
         cluster_data = cumulative_trajectories.loc[cluster_clients]
 
-        # Calculate statistics
-        final_scores = cluster_data.iloc[:, -1]  # Last session cumulative score
+        final_scores = cluster_data.iloc[:, -1] 
         mean_final = final_scores.mean()
         std_final = final_scores.std()
         min_final = final_scores.min()
         max_final = final_scores.max()
 
-        # Calculate trajectory characteristics
-        initial_score = cluster_data.iloc[:, 0].mean()  # Average score in session 1
-        growth_rate = (final_scores - cluster_data.iloc[:, 0]).mean()  # Average total growth
+        initial_score = cluster_data.iloc[:, 0].mean()
+        growth_rate = (final_scores - cluster_data.iloc[:, 0]).mean() 
 
         cluster_summary.append({
             'cluster': i+1,
@@ -139,15 +112,13 @@ def analyze_clusters(cumulative_trajectories, clusters, n_clusters=4):
     return pd.DataFrame(cluster_summary)
 
 def compute_stopping_points(cumulative_trajectories):
-    """Compute stopping points t*_i for each client using 90% of total progress rule"""
     stopping_points = {}
 
     for client_id in cumulative_trajectories.index:
         trajectory = cumulative_trajectories.loc[client_id]
-        total_progress = trajectory.iloc[-1]  # Final cumulative score
+        total_progress = trajectory.iloc[-1]  
         threshold = 0.9 * total_progress
 
-        # Find earliest session where cumulative progress >= 90% of total
         stopping_point = None
         for session in range(1, len(trajectory) + 1):
             if trajectory.iloc[session - 1] >= threshold:
@@ -163,7 +134,6 @@ def compute_stopping_points(cumulative_trajectories):
     return pd.Series(stopping_points)
 
 def compute_empirical_cdf(values, max_q):
-    """Compute empirical CDF for values up to max_q"""
     cdf = {}
     sorted_values = sorted(values)
 
@@ -175,12 +145,7 @@ def compute_empirical_cdf(values, max_q):
     return cdf
 
 # Part B: Derive the optimal reassessment policy from the cluster-specific progress distributions
-# This section computes each client's stopping point and evaluates the expected sessions saved
-# for each potential reassessment session Q.
 def find_optimal_reassessment_policy(cumulative_trajectories, clusters, n_clusters=4, T_max=12):
-    """Find optimal reassessment policy for each cluster using newsvendor-style audit model"""
-
-    # Compute stopping points for all clients
     stopping_points = compute_stopping_points(cumulative_trajectories)
 
     print(f"\n=== Optimal Reassessment Policy Analysis (T_max={T_max}) ===")
@@ -197,7 +162,6 @@ def find_optimal_reassessment_policy(cumulative_trajectories, clusters, n_cluste
         # Compute empirical CDF
         empirical_cdf = compute_empirical_cdf(cluster_stopping_points.values, T_max)
 
-        # Compute expected savings for each Q
         savings_by_q = {}
         max_savings = -1
         optimal_q = None
@@ -230,30 +194,21 @@ def find_optimal_reassessment_policy(cumulative_trajectories, clusters, n_cluste
     return policy_results, stopping_points
 
 # Part C: Select K using policy outcomes and clustering quality
-# This section evaluates candidate K values, compares silhouette scores and unique policies,
-# and chooses the most actionable clustering solution.
 def evaluate_k_values(cumulative_trajectories, k_values=[3, 4, 5, 6]):
-    """Evaluate different K values and their resulting policies"""
     print("\n=== Evaluating Different K Values ===")
 
     k_results = []
 
     for k in k_values:
         print(f"\n--- Evaluating K={k} ---")
-
-        # Apply clustering
         clusters, kmeans, scaler, silhouette_avg = apply_clustering(cumulative_trajectories, k)
-
-        # Get policy results
         policy_results, stopping_points = find_optimal_reassessment_policy(
             cumulative_trajectories, clusters, k, T_max=12
         )
 
-        # Extract optimal Q values
         optimal_qs = [result['optimal_q'] for result in policy_results]
         unique_qs = len(set(optimal_qs))
 
-        # Calculate average savings
         avg_savings = np.mean([result['max_expected_savings'] for result in policy_results])
 
         k_results.append({
@@ -271,7 +226,6 @@ def evaluate_k_values(cumulative_trajectories, k_values=[3, 4, 5, 6]):
     return k_results
 
 def select_optimal_k(k_results):
-    """Select the optimal K based on policy distinctness and actionability"""
     print("\n=== Selecting Optimal K ===")
 
     # Criteria for selection:
@@ -284,8 +238,6 @@ def select_optimal_k(k_results):
     best_score = -1
 
     for result in k_results:
-        # Score based on: silhouette + (unique_policies * 0.5) + (avg_savings * 0.1)
-        # Prioritize unique policies and clustering quality
         score = result['silhouette_score'] + (result['unique_policies'] * 0.3) + (result['avg_savings'] * 0.05)
 
         print(f"K={result['k']}: Score={score:.3f} (Silhouette={result['silhouette_score']:.3f}, "
@@ -298,16 +250,13 @@ def select_optimal_k(k_results):
     return best_k, k_results
 
 # Part D: Required plots for the final chosen K
-# This section generates the three required visualizations for the selected clustering policy.
 def create_stopping_point_histograms(cumulative_trajectories, clusters, stopping_points, n_clusters=5):
-    """Create Plot 1: t* distributions - histograms of stopping points for each cluster"""
     fig, axes = plt.subplots(1, n_clusters, figsize=(15, 4), sharex=True, sharey=True)
 
     for c in range(n_clusters):
         cluster_clients = cumulative_trajectories.index[clusters == c]
         cluster_stopping_points = stopping_points.loc[cluster_clients]
 
-        # Create histogram
         counts, bins, patches = axes[c].hist(cluster_stopping_points, bins=range(1, 14), alpha=0.7,
                                            edgecolor='black', align='left')
 
@@ -317,7 +266,6 @@ def create_stopping_point_histograms(cumulative_trajectories, clusters, stopping
             axes[c].set_ylabel('Number of Clients')
         axes[c].grid(True, alpha=0.3)
 
-        # Add text with mean stopping point
         mean_stop = cluster_stopping_points.mean()
         axes[c].axvline(mean_stop, color='red', linestyle='--', alpha=0.7, linewidth=2)
         axes[c].text(0.05, 0.95, f'Mean: {mean_stop:.1f}',
@@ -332,7 +280,6 @@ def create_stopping_point_histograms(cumulative_trajectories, clusters, stopping
     return fig
 
 def create_savings_vs_q_plot(policy_results, n_clusters=5):
-    """Create Plot 2: Expected sessions saved vs Q for each cluster"""
     fig, ax = plt.subplots(1, 1, figsize=(12, 8))
 
     colors = sns.color_palette("husl", n_clusters)
@@ -350,7 +297,6 @@ def create_savings_vs_q_plot(policy_results, n_clusters=5):
         ax.plot(q_values, savings_values, 'o-', color=colors[c], linewidth=2, markersize=6,
                label=f'Cluster {cluster_num} (n={n_clients})')
 
-        # Mark optimal Q with vertical dashed line
         ax.axvline(x=optimal_q, color=colors[c], linestyle='--', alpha=0.7, linewidth=2)
         ax.text(optimal_q + 0.1, max(savings_values) * 0.9, f'Q*={optimal_q}',
                color=colors[c], fontsize=10, fontweight='bold')
@@ -369,7 +315,6 @@ def create_savings_vs_q_plot(policy_results, n_clusters=5):
     return fig
 
 def create_optimized_vs_baseline_comparison(policy_results, stopping_points, clusters, cumulative_trajectories, n_clusters=5):
-    """Create Plot 3: Optimized Q* vs mean(t*) baseline comparison"""
     fig, ax = plt.subplots(1, 1, figsize=(12, 6))
 
     cluster_labels = []
@@ -409,7 +354,6 @@ def create_optimized_vs_baseline_comparison(policy_results, stopping_points, clu
               f"Optimized Q = {optimal_q}, Baseline savings = {baseline_savings_val:.2f}, "
               f"Optimized savings = {max_savings:.2f}")
 
-    # Create grouped bar chart
     x = np.arange(len(cluster_labels))
     width = 0.35
 
@@ -426,7 +370,6 @@ def create_optimized_vs_baseline_comparison(policy_results, stopping_points, clu
     ax.legend()
     ax.grid(True, alpha=0.3, axis='y')
 
-    # Add value labels on bars
     for bar in bars1:
         height = bar.get_height()
         ax.text(bar.get_x() + bar.get_width()/2., height + 0.05,
@@ -441,7 +384,6 @@ def create_optimized_vs_baseline_comparison(policy_results, stopping_points, clu
     plt.savefig('output/q2/plot3_optimized_vs_baseline.png', dpi=300, bbox_inches='tight')
     plt.show()
 
-    # Calculate overall improvement
     overall_improvement = total_optimized_savings - total_baseline_savings
     improvement_per_client = overall_improvement / total_clients
 
@@ -453,9 +395,7 @@ def create_optimized_vs_baseline_comparison(policy_results, stopping_points, clu
     return fig, overall_improvement, improvement_per_client
 
 # Part E: Generate the summary table for the final K and recommended policy
-# This section summarizes each cluster's size, optimal reassessment session, and expected savings.
 def generate_summary_table(policy_results, n_clusters=5, T_max=12):
-    """Generate and save a summary table for the final K choice."""
     rows = []
     total_saved = 0.0
     total_clients = 0
@@ -501,7 +441,6 @@ def generate_summary_table(policy_results, n_clusters=5, T_max=12):
 
 
 def main():
-    """Main function to run the clustering analysis and select optimal K"""
     print("Loading and preparing data...")
     trajectories, cumulative_trajectories = load_and_prepare_data()
 
